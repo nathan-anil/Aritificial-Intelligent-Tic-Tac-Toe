@@ -1,0 +1,52 @@
+
+h1 {
+	color: #e65c00; 
+	text-align:center;
+	font-size:70pt;
+	font-family:sans-serif;
+	}
+	body {
+		background-color:powderblue ; 
+		
+	}
+	
+	p {
+		font-size:15pt;
+		color:black;
+		font-stress:5;
+		#ffb380   
+	}
+	
+	p.center {
+		font-size:10pt;
+		text-align:bottom;
+		
+	}
+	
+ button{
+	background-color: #008CBA; 
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 30px;
+	margin:auto;
+	 width: 200px;
+        height: 70px;
+		 background-color: #008CBA; 
+  color: white; 
+  vertical-align: middle
+ 
+}
+
+button {border-radius: 8px;}
+button:focus {outline:0 !important;}
+
+
+button:hover {
+  background-color:#0079A1 ;
+  color: white;
+  transition-duration:0.2s;
+}

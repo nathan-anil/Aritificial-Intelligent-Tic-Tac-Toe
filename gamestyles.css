@@ -1,0 +1,44 @@
+h1 {
+	color:#e65c00    ;
+	text-align:center;
+	font-size:70pt;
+	font-family:sans-serif;
+	vertical-align:top;
+	
+}
+h2 {
+	margin:auto;
+	font-family:calibri;
+	font-size:30pt;
+	text-align:center;
+	vertical-align:super;
+}
+body {
+	background-color:powderblue;
+	
+	
+}
+button {background-color: #008CBA; ; 
+  border: none;
+  color: white;
+  padding:15px 32px;
+   position: absolute;
+  top: 50px;
+  left: 50px;
+  font-size: 18px;
+  text-decoration: none;
+display: inline-block;
+  font-size: 28px;
+	margin: 0 auto;
+	 width: 180px;
+        height: 55px;
+		 background-color: #008CBA; 
+    vertical-align: middle;
+	border-radius:4px;
+}
+button:hover {
+  background-color:#0079A1 ;
+  color: white;
+  transition-duration:0.2s;
+}
+button:focus {outline:0 !important;}

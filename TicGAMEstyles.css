@@ -1,0 +1,37 @@
+button {background-color: #008CBA; 
+  border: none;
+  color: white;
+  padding:15px 32px;
+   
+  font-size: 18px;
+  text-decoration: none;
+display: inline-block;
+  font-size: 28px;
+	margin: 0 auto;
+	 width: 200px;
+        height: 80px;
+		 background-color: #008CBA; 
+   /* vertical-align: middle;
+	text-align: center;*/ 
+		border-radius:4px;
+
+}
+button:hover {
+  background-color:#0079A1 ;
+  color: white;
+  transition-duration:0.2s;
+}
+button:focus {outline:0 !important;}
+
+body {  
+    background-color: powderblue;  
+}  
+canvas {
+	background-color:#009cbd;
+	position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin:auto;
+}

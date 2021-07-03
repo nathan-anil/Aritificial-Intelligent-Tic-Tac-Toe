@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+
+<head> 
+	<title>Play Tic-Tac-Toe</title>
+	 <link rel="stylesheet" href="TicGAMEstyles.css">
+	 
+	 
+	 
+<script>
+var endGameData = {
+  startRow : 0,
+  startCol : 0,
+  endRow:0,
+  endCol:0,
+};
+
+var tictacArray; 
+var gameOver = false;
+
+function goBack() {
+  window.history.back()
+}
+function play(e) {
+	if ( gameOver) {
+		alert ("GAME OVER");
+		return ;
+	}
+    var element = document.getElementById("ticTacCanvas");
+	var ticCanvas = element;
+	var offsetX = 0, offsetY = 0;
+    if (element.offsetParent) {
+      do {
+        offsetX += element.offsetLeft;
+        offsetY += element.offsetTop;
+      } while ((element = element.offsetParent));
+    }
+	var x = e.pageX - offsetX;
+    var y = e.pageY - offsetY;
+	console.log(x + ", "  + y);
+	var i = Math.floor(x / 300);
+	var j =  Math.floor(y / 200) ;
+	//player value is 5
+	if (tictacArray[i][j] == 0 ) { // emtpy allow
+		tictacArray[i][j] = 5;
+		drawSymbol(1, ticCanvas, i, j); 
+		// computer play
+		window.setTimeout(function() {
+			systemPlay(ticCanvas);
+		}, 100)
+	}
+	
+ }
+ 
+ function gameOverStrikeLine(aCanvas, endGameDat) {
+  	var x =  endGameDat.startRow * 300 + 150;
+	var y = endGameDat.startCol * 200 + 100;
+ 	var ctx = aCanvas.getContext("2d");
+	ctx.beginPath();
+	ctx.moveTo(x, y);
+  	x =  endGameDat.endRow * 300 + 150;
+	y = endGameDat.endCol * 200 + 100;	
+	ctx.lineTo(x, y);
+	ctx.stroke();
+ }
+ 
+ function getRndInteger(min, max) {
+  return Math.floor(Math.random() * (max - min) ) + min;
+}
+
+ function systemPlay( aCanvas, first ) {
+	if ( first ) {
+		var x1 = getRndInteger(0, 2);
+		var y1 = getRndInteger(0, 2);
+		tictacArray[x1][y1] = 1;
+		drawSymbol(2, aCanvas, x1, y1);
+		return;
+	}
+	//check wether system have a chance to win 
+	// check rows
+	var rowCol = checkAndFind(2);
+	if ( rowCol[2] == 1 ) { // sytem will win in next move
+		tictacArray[rowCol[0]][ rowCol[1]] = 1;
+		drawSymbol(2, aCanvas, rowCol[0], rowCol[1]); 
+		gameOverStrikeLine(aCanvas,rowCol[3]);
+		gameOver = true;
+	} else { 
+		//check wether opponent have a chance to win and block it 
+		 rowCol = checkAndFind(10);
+		if ( rowCol[2] == 1 ) { // opponent will win in next move ; block it
+			tictacArray[rowCol[0]][ rowCol[1]] = 1;
+			drawSymbol(2, aCanvas, rowCol[0], rowCol[1]); 
+		} else { 	//create a chance for you
+
+			if ( rowCol[2] == 0 ) {
+				if ( tictacArray[1][1] == 0 ) { // if center is free then use it 
+						rowCol = [1,1,1];
+				}
+			}
+			if ( rowCol[2] == 0 ) { // fix for corner trap
+				if ( tictacArray[2][2] == 0 && tictacArray[2][1] == 5 && tictacArray[1][2] == 5) { // if corner free then use it 
+					rowCol = [2,2,1];
+				}
+			}
+ 
+			if ( rowCol[2] == 0 ) {
+				rowCol = checkAndFind(1);
+			}
+			if ( rowCol[2] == 0 ) {
+				// find an empty row or col
+				rowCol = checkAndFind(0);
+			}
+			if ( rowCol[2] == 0 ) { 
+				rowCol = findaPosition();
+			}
+			if ( rowCol[2] == 0 ) { 
+				gameOver = true;
+			} else {
+				tictacArray[rowCol[0]][ rowCol[1]] = 1;
+				drawSymbol(2, aCanvas, rowCol[0], rowCol[1]); 
+			}
+		}
+	} 
+ }
+ 
+ function checkAndFind(rowTotTowin) {
+	var rowCol  = [0,0,0,0];
+	rowCol[3] = Object.create( endGameData);
+	for ( var i = 0; i < 3; i++ ) {
+		var rowTotal = 0;
+		var colTotal = 0;
+		for ( var j = 0; j < 3; j ++ ) {
+			rowTotal =  rowTotal + tictacArray[i][j];
+			colTotal =  colTotal + tictacArray[j][i];
+		}
+		if ( rowTotal == rowTotTowin ) {
+			// there is a chance to win - row ; find the place to play 
+			rowCol[0]= i;
+			rowCol[1] = findColumn( i );
+			rowCol[2] = 1; 
+			rowCol[3].startRow = i;
+			rowCol[3].startCol = 0;
+			rowCol[3].endRow = i;
+			rowCol[3].endCol = 2;
+			break;
+		}
+		if (rowCol[2] == 0 ) {
+			if ( colTotal == rowTotTowin ) {
+				// there is a chance to win - col ; find the place to play 
+				rowCol[0]= findRow( i );
+				rowCol[1] = i;
+				rowCol[2] = 1;
+				rowCol[3].startRow = 0;
+				rowCol[3].startCol = i;
+				rowCol[3].endRow = 2;
+				rowCol[3].endCol = i;
+				break;
+			}
+		}
+	}
+	if ( rowCol[2] == 0 ) { // check diagonals;
+		rowTotal = tictacArray[0][0] + tictacArray[1][1] + tictacArray[2][2] ;
+		if ( rowTotal == rowTotTowin ) {
+			var diag = findEmptyDiag1();
+			rowCol[0]= diag;
+			rowCol[1] = diag;
+			rowCol[2] = 1;
+			rowCol[3].startRow = 0;
+			rowCol[3].startCol = 0;
+			rowCol[3].endRow = 2;
+			rowCol[3].endCol = 2;
+			
+		} else {// second diagonal
+			rowTotal = tictacArray[2][0] + tictacArray[1][1] + tictacArray[0][2] ;
+			if ( rowTotal == rowTotTowin ) {
+				rowCol = findEmptyDiag2();
+				rowCol[3].startRow = 2;
+				rowCol[3].startCol = 0;
+				rowCol[3].endRow = 0;
+				rowCol[3].endCol = 2;
+			}
+		} 
+	}
+	return rowCol;
+ }
+ 
+ 
+ 
+  function findEmptyDiag1(){
+ 	for ( var i = 0; i < 3; i++ ) {
+		if ( tictacArray[i][i] == 0 ) {
+			return i;
+		}
+	}
+ }
+ 
+ function findEmptyDiag2(){
+	var rowCol = [0, 0,0,0];
+	rowCol[3] = Object.create( endGameData);
+	if ( tictacArray[2][0] == 0 ) {
+		rowCol[0]= 2;
+		rowCol[1] = 0;
+		rowCol[2] = 1;
+	} else if( tictacArray[1][1] == 0 ) {
+		rowCol[0]= 1;
+		rowCol[1] = 1;
+		rowCol[2] = 1
+	} else if( tictacArray[0][2] == 0 ) {
+		rowCol[0]= 0;
+		rowCol[1] = 2;
+		rowCol[2] = 1
+	}
+	return rowCol;
+ }
+ 
+ function findColumn( row ){
+	// preffer corner
+	var col = 0;
+ 	for ( var j = 2; j >= 0; j-- ) {
+		if ( tictacArray[row][j] == 0 ) {
+			col = j;
+			if ( j == 0 || j == 2) {
+				break;
+			}
+		}
+	}
+	return col;
+ }
+ 
+  
+ function findRow( col ){
+	var raw;
+ 	for ( var i = 2; i >= 0; i-- ) {
+		if ( tictacArray[i][col] == 0 ) {
+			raw = i;
+			if ( i == 0 || i == 2) {
+				break;
+			}
+		}
+	}
+	return raw;
+ }
+ 
+  function findaPosition(){
+	var rowCol = [0, 0,0];
+
+	if ( rowCol[2] == 0 ) {
+		for ( var i = 0; i < 3; i++ ) {
+			for ( var j = 0; j < 3; j ++ ) {
+				if ( tictacArray[i][j] == 0 ) {
+					rowCol[0]= i;
+					rowCol[1] = j;
+					rowCol[2] = 1;
+				}
+			}
+		}
+	}
+		
+	return rowCol;
+ }
+ 
+ function drawSymbol ( playerId, aCanvas, x, y ) {
+ 	x =  x * 300 + 150;
+	y = y * 200 + 100;
+ 	var ctx = aCanvas.getContext("2d");
+	ctx.beginPath();
+	if ( playerId == 1) {
+		ctx.arc(x, y, 50, 0, 2 * Math.PI);
+	} else {
+		ctx.moveTo(x -50, y-50);
+		ctx.lineTo(x+50, y+50);
+		ctx.moveTo(x + 50 , y-50);
+		ctx.lineTo(x-50, y+50);
+	}
+	ctx.stroke();
+ }
+ 
+function drawTicTacToe( aCanvas) {
+	var ctx = aCanvas.getContext("2d");
+	// horizontal lines
+	ctx.moveTo(25, 200);
+	ctx.lineTo(875, 200);
+	ctx.moveTo(25, 400);
+	ctx.lineTo(875, 400);
+	//vertical lines
+	ctx.moveTo(300, 25);
+	ctx.lineTo(300, 575);
+	ctx.moveTo(600, 25);
+	ctx.lineTo(600, 575)
+	ctx.lineWidth = 10;
+	ctx.stroke();
+}
+
+function  initialize() {
+ tictacArray = [
+  [0, 0, 0],
+  [0, 0, 0],
+  [0, 0, 0],
+];
+ gameOver = false;
+
+ var aCanvas = document.getElementById("ticTacCanvas");
+ aCanvas.addEventListener("click", play, false);
+ drawTicTacToe(aCanvas);
+ systemPlay( aCanvas, true );
+
+}
+
+function playAgain() {
+ tictacArray = [
+  [0, 0, 0],
+  [0, 0, 0],
+  [0, 0, 0],
+];
+ gameOver = false;
+  var aCanvas = document.getElementById("ticTacCanvas");
+ var ctx = aCanvas.getContext("2d");
+ ctx.fillStyle = "blue";
+ ctx.moveTo(0,0);
+ ctx.fillRect(0, 0, 900, 600);
+ ctx.stroke();
+ctx.fillStyle = "#009cbd";
+ ctx.fillRect(0, 0, 900, 600);
+ ctx.beginPath();
+  drawTicTacToe(aCanvas);
+}
+	
+	
+</script>
+
+
+
+	<link rel="stylesheet" href="TicGAMEstyles.css">
+	<meta name='viewport' content='width=device-width, initial-scale=1'>
+	<link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.5.0/css/all.css' integrity='sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU' crossorigin='anonymous'>
+</head>
+
+
+<body onload="initialize();">
+
+<br>
+	<button onclick="goBack()">Home <i class='fas fa-home'></i></button>
+	
+	<p id="demo"></P>
+	<br><br><br>
+
+	<button type="button" onclick="playAgain();"> Reset</button>
+			<canvas id="ticTacCanvas" width="900" height="600" style="border:0px solid #000000;">
+			
+				Error : your browser needs to be updated or changed 
+			
+			</canvas>
+
+
+
+
+
+
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
